@@ -13,6 +13,7 @@ impl Screen {
     pub fn build(&self, snake: &Snake, food: &food::Food) -> String {
         let mut res = Vec::<String>::new();
         let mut baseline = String::new();
+        baseline.push('\r');
         for _ in 0..self.height {
             baseline.push('#');
         }

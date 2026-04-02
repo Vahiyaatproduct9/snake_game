@@ -10,7 +10,7 @@ use crossterm::{
 use rand::RngExt;
 
 use crate::{
-    SCREEN_HEIGHT, SCREEN_WIDTH,
+    SCREEN_HEIGHT, SCREEN_WIDTH, SPEED,
     objects::{self, Direction, food::Food, snake::Snake},
     screen::Screen,
 };
@@ -33,15 +33,17 @@ impl Game {
     pub fn build(&self) {
         let screen = self.screen.build(&self.snake, &self.food);
         println!("{}", screen);
-        println!("Score: {}", self.score);
+        println!("\rScore: {}", self.score);
     }
 
     pub fn run(&mut self) -> Result<()> {
         enable_raw_mode()?;
-        let tick_rate = Duration::from_millis(300);
+        let tick_rate = Duration::from_millis(500 / SPEED);
         let mut last_tick = Instant::now();
+        let poll_rate = if 500 / SPEED < 50 { 500 / SPEED } else { 50 };
         loop {
-            if event::poll(Duration::from_millis(50)).unwrap()
+            print!("{:?}", self.food);
+            if event::poll(Duration::from_millis(poll_rate)).unwrap()
                 && let Event::Key(key) = event::read().unwrap()
             {
                 if key.code == KeyCode::Char('q') {
@@ -80,7 +82,7 @@ impl Game {
             }
 
             if self.game == GameState::Over {
-                println!("GAME OVER! YOU SCORED: {}", self.score);
+                println!("\rGAME OVER! YOU SCORED: {}\n\r", self.score);
                 break;
             }
         }
@@ -111,7 +113,7 @@ impl Game {
             width: scrw,
         } = self.screen;
 
-        if x >= scrw - 2 || x <= 0 || y >= scrh - 2 || y <= 0 {
+        if x >= scrw - 2 || x < 0 || y >= scrh - 2 || y < 0 {
             self.game = GameState::Over
         }
 
