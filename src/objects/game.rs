@@ -10,7 +10,8 @@ use crossterm::{
 use rand::RngExt;
 
 use crate::{
-    objects::{self, Direction, SCREEN_LENGTH, food::Food, snake::Snake},
+    SCREEN_HEIGHT, SCREEN_WIDTH,
+    objects::{self, Direction, food::Food, snake::Snake},
     screen::Screen,
 };
 
@@ -86,17 +87,18 @@ impl Game {
         disable_raw_mode()?;
         Ok(())
     }
+
     pub fn new() -> Self {
-        let random_x = rand::rng().random_range(0..(SCREEN_LENGTH / 2));
-        let random_y = rand::rng().random_range(0..(SCREEN_LENGTH / 2));
-        let snake_pos_x = random_x + (SCREEN_LENGTH / 4);
-        let snake_pos_y = random_y + (SCREEN_LENGTH / 4);
+        let random_x = rand::rng().random_range(0..(SCREEN_WIDTH / 2));
+        let random_y = rand::rng().random_range(0..(SCREEN_HEIGHT / 2));
+        let snake_pos_x = random_x + (SCREEN_WIDTH / 4);
+        let snake_pos_y = random_y + (SCREEN_HEIGHT / 4);
         Self {
             food: Food::new(),
             game: GameState::Playing,
             snake: Snake::new(Some((snake_pos_x, snake_pos_y))),
             score: 0,
-            screen: Screen::square(SCREEN_LENGTH),
+            screen: Screen::new(SCREEN_HEIGHT, SCREEN_WIDTH),
         }
     }
 

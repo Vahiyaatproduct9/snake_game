@@ -6,12 +6,10 @@ pub struct Screen {
 }
 
 impl Screen {
-    pub fn square(length: i32) -> Self {
-        Self {
-            height: length,
-            width: length,
-        }
+    pub fn new(height: i32, width: i32) -> Self {
+        Self { height, width }
     }
+
     pub fn build(&self, snake: &Snake, food: &food::Food) -> String {
         let mut res = Vec::<String>::new();
         let mut baseline = String::new();

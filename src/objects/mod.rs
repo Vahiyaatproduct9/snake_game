@@ -8,4 +8,3 @@ pub enum Direction {
     Left,
     Right,
 }
-pub const SCREEN_LENGTH: i32 = 50;
