@@ -1,9 +1,8 @@
-extern crate piston_window;
-extern crate rand;
-
-mod draw;
-mod snake;
+mod objects;
+mod screen;
+use objects::game::Game;
 
 fn main() {
-    println!("Hello, world!");
+    let mut game = Game::new();
+    game.run();
 }
