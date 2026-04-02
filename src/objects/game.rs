@@ -10,7 +10,7 @@ use crossterm::{
 use rand::RngExt;
 
 use crate::{
-    objects::{self, Direction, SCREEN_LENGTH, Snake, food::Food},
+    objects::{self, Direction, SCREEN_LENGTH, food::Food, snake::Snake},
     screen::Screen,
 };
 

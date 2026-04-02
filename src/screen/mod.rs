@@ -1,4 +1,4 @@
-use crate::objects::{Snake, food};
+use crate::objects::{food, snake::Snake};
 #[derive(Debug, Clone, Copy)]
 pub struct Screen {
     pub height: i32,
