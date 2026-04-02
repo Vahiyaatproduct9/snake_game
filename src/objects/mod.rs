@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
+pub mod food;
 pub mod game;
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Direction {
     Up,
     Down,
@@ -10,14 +11,15 @@ pub enum Direction {
 
 #[derive(Clone, Debug)]
 pub struct Snake {
-    pub body: VecDeque<(u32, u32)>,
+    pub body: VecDeque<(i32, i32)>,
     pub direction: Direction,
 }
 
+pub const SCREEN_LENGTH: i32 = 50;
 impl Snake {
-    pub fn new(position: Option<(u32, u32)>) -> Self {
-        let mut body: VecDeque<(u32, u32)> = VecDeque::new();
-        const DEFAULT_LENGTH: u32 = 3;
+    pub fn new(position: Option<(i32, i32)>) -> Self {
+        let mut body: VecDeque<(i32, i32)> = VecDeque::new();
+        const DEFAULT_LENGTH: i32 = 3;
         for i in 0..DEFAULT_LENGTH {
             body.push_back((i, 0));
         }
@@ -48,7 +50,7 @@ impl Snake {
     }
 
     pub fn move_forward(&mut self) {
-        self.grow();
         self.body.pop_back();
+        self.grow();
     }
 }

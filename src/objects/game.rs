@@ -10,14 +10,13 @@ use crossterm::{
 use rand::RngExt;
 
 use crate::{
-    objects::{self, Snake},
+    objects::{self, Direction, SCREEN_LENGTH, Snake, food::Food},
     screen::Screen,
 };
-const SCREEN_LENGTH: u32 = 50;
+
 #[derive(Eq, PartialEq)]
 pub enum GameState {
     Over,
-    Won,
     Playing,
 }
 
@@ -29,26 +28,11 @@ pub struct Game {
     pub screen: Screen,
 }
 
-#[derive(Clone, Copy)]
-pub struct Food(pub u32, pub u32);
-impl Food {
-    fn new() -> Self {
-        Self(
-            rand::rng().random_range(0..SCREEN_LENGTH),
-            rand::rng().random_range(0..SCREEN_LENGTH),
-        )
-    }
-
-    fn spawn(&mut self) {
-        self.0 = rand::rng().random_range(0..SCREEN_LENGTH);
-        self.1 = rand::rng().random_range(0..SCREEN_LENGTH);
-    }
-}
-
 impl Game {
     pub fn build(&self) {
         let screen = self.screen.build(&self.snake, &self.food);
         println!("{}", screen);
+        println!("Score: {}", self.score);
     }
 
     pub fn run(&mut self) -> Result<()> {
@@ -56,18 +40,34 @@ impl Game {
         let tick_rate = Duration::from_millis(300);
         let mut last_tick = Instant::now();
         loop {
-            if event::poll(Duration::from_millis(50)).unwrap() {
-                if let Event::Key(key) = event::read().unwrap() {
-                    if key.code == KeyCode::Char('q') {
-                        break;
-                    };
-                    self.snake.direction = match key.code {
-                        KeyCode::Up => objects::Direction::Up,
-                        KeyCode::Down => objects::Direction::Down,
-                        KeyCode::Left => objects::Direction::Left,
-                        KeyCode::Right => objects::Direction::Right,
-                        _ => self.snake.direction,
+            if event::poll(Duration::from_millis(50)).unwrap()
+                && let Event::Key(key) = event::read().unwrap()
+            {
+                if key.code == KeyCode::Char('q') {
+                    break;
+                };
+                match key.code {
+                    KeyCode::Up => {
+                        if self.snake.direction != Direction::Down {
+                            self.snake.direction = objects::Direction::Up;
+                        }
                     }
+                    KeyCode::Down => {
+                        if self.snake.direction != Direction::Up {
+                            self.snake.direction = objects::Direction::Down;
+                        }
+                    }
+                    KeyCode::Left => {
+                        if self.snake.direction != Direction::Right {
+                            self.snake.direction = objects::Direction::Left;
+                        }
+                    }
+                    KeyCode::Right => {
+                        if self.snake.direction != Direction::Left {
+                            self.snake.direction = objects::Direction::Right;
+                        }
+                    }
+                    _ => (),
                 }
             }
             if last_tick.elapsed() >= tick_rate {
@@ -79,6 +79,7 @@ impl Game {
             }
 
             if self.game == GameState::Over {
+                println!("GAME OVER! YOU SCORED: {}", self.score);
                 break;
             }
         }
@@ -102,11 +103,17 @@ impl Game {
     pub fn check_collision(&mut self) {
         let head = self.snake.body.front().unwrap();
         let (x, y) = *head;
+
         let Screen {
             height: scrh,
             width: scrw,
         } = self.screen;
-        if x >= scrw || y >= scrh {
+
+        if x >= scrw - 2 || x <= 0 || y >= scrh - 2 || y <= 0 {
+            self.game = GameState::Over
+        }
+
+        if self.snake.body.iter().skip(1).any(|pos| pos == head) {
             self.game = GameState::Over
         }
     }
